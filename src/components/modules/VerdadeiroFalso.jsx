@@ -2,31 +2,31 @@ import { useState } from 'react'
 import { CheckCircle, XCircle, ArrowRight, RotateCcw } from 'lucide-react'
 
 const STATEMENTS = [
-  { s: 'O SSD possui partes mecânicas em movimento.', answer: false, exp: 'FALSO. O SSD (Solid-State Drive) usa chips de memória flash sem partes móveis, ao contrário do HD tradicional.' },
-  { s: 'A RAM perde os dados quando o computador é desligado.', answer: true, exp: 'VERDADEIRO. A RAM é uma memória volátil: precisa de energia constante e perde todo o conteúdo ao desligar.' },
-  { s: 'O Windows foi o primeiro sistema operacional com interface gráfica.', answer: false, exp: 'FALSO. O Mac OS da Apple (1984) foi o primeiro SO comercial com interface gráfica. O Windows 1.0 veio em 1985.' },
-  { s: 'O phishing ocorre por meio de links maliciosos em e-mails ou sites falsos.', answer: true, exp: 'VERDADEIRO. Phishing é um golpe que usa links e páginas falsas para enganar o usuário e roubar dados.' },
-  { s: 'O backup serve para criar cópia de segurança dos dados.', answer: true, exp: 'VERDADEIRO. Backup é a prática de copiar dados para outro local para proteção em caso de perda ou dano.' },
-  { s: 'O HD é mais rápido que o SSD.', answer: false, exp: 'FALSO. O SSD é significativamente mais rápido que o HD, pois não precisa de partes mecânicas para acessar dados.' },
-  { s: 'USB significa Universal Serial Bus.', answer: true, exp: 'VERDADEIRO. USB = Universal Serial Bus. É um padrão de interface para conectar dispositivos ao computador.' },
-  { s: 'O Linux foi criado por Bill Gates.', answer: false, exp: 'FALSO. O Linux foi criado por Linus Torvalds, em 1991. Bill Gates fundou a Microsoft e criou o Windows.' },
-  { s: 'O firewall protege o computador contra acessos indevidos na rede.', answer: true, exp: 'VERDADEIRO. O firewall monitora e filtra o tráfego de rede, bloqueando conexões não autorizadas.' },
-  { s: 'O processador (CPU) é a memória principal do computador.', answer: false, exp: 'FALSO. O processador é o "cérebro" do computador (processa dados). A memória principal é a RAM.' },
-  { s: 'A RAM é uma memória volátil.', answer: true, exp: 'VERDADEIRO. Memória volátil significa que os dados são perdidos quando a energia é desligada.' },
-  { s: 'O pendrive é um exemplo de hardware externo.', answer: true, exp: 'VERDADEIRO. Pendrive é um dispositivo de armazenamento portátil conectado externamente via USB.' },
-  { s: 'O antivírus substitui completamente o firewall.', answer: false, exp: 'FALSO. Antivírus e firewall têm funções complementares. O antivírus remove malwares já existentes; o firewall filtra o tráfego de rede.' },
-  { s: 'O Mac OS surgiu em 1984.', answer: true, exp: 'VERDADEIRO. O primeiro Macintosh com seu sistema operacional gráfico foi lançado pela Apple em 24 de janeiro de 1984.' },
-  { s: 'Malware é um software desenvolvido para prejudicar o computador ou roubar dados.', answer: true, exp: 'VERDADEIRO. Malware (malicious software) é o termo geral para vírus, ransomware, spyware e outros softwares maliciosos.' },
-  { s: 'A placa de vídeo (GPU) é a mesma coisa que a CPU.', answer: false, exp: 'FALSO. A GPU processa gráficos e imagens, enquanto a CPU realiza processamentos gerais. São componentes distintos.' },
-  { s: 'O ransomware criptografa dados e cobra resgate para liberá-los.', answer: true, exp: 'VERDADEIRO. Ransomware = "ransom" (resgate) + "ware" (software). Bloqueia o acesso aos dados e exige pagamento.' },
-  { s: 'O sistema operacional é um exemplo de software.', answer: true, exp: 'VERDADEIRO. O sistema operacional (Windows, Linux, Mac OS) é um software de sistema que gerencia o hardware e outros programas.' },
-  { s: 'A memória ROM perde seus dados ao desligar o computador.', answer: false, exp: 'FALSO. ROM (Read-Only Memory) é uma memória permanente que mantém seus dados mesmo sem energia elétrica.' },
-  { s: 'O HD utiliza discos magnéticos giratórios para armazenar dados.', answer: true, exp: 'VERDADEIRO. O HD (Hard Disk Drive) armazena dados em discos metálicos que giram em alta velocidade, usando magnetismo.' },
+  { s: 'Sistema computacional é a união de hardware e software trabalhando juntos.', answer: true,  exp: 'VERDADEIRO. Hardware (parte física) + Software (parte lógica) = Sistema Computacional. Um não funciona sem o outro.' },
+  { s: 'Software é a parte física do computador, como teclado e monitor.', answer: false, exp: 'FALSO. Software é a parte intangível — programas e instruções. Hardware é a parte física que você pode tocar.' },
+  { s: 'A CPU é chamada de "cérebro" do computador.', answer: true,  exp: 'VERDADEIRO. A CPU (Unidade Central de Processamento) executa todas as instruções e processa os dados do computador.' },
+  { s: 'O HD é mais rápido que o SSD.', answer: false, exp: 'FALSO. O SSD é muito mais rápido que o HD. Usa chips de memória flash sem partes móveis, enquanto o HD tem discos magnéticos giratórios.' },
+  { s: 'A memória RAM perde todos os dados quando o computador é desligado.', answer: true,  exp: 'VERDADEIRO. A RAM é volátil: precisa de energia elétrica constante. Ao desligar, todo o conteúdo armazenado é perdido.' },
+  { s: 'O monitor é um exemplo de dispositivo de saída.', answer: true,  exp: 'VERDADEIRO. Dispositivos de saída exibem resultados ao usuário: monitor, impressora, caixa de som e projetor. O teclado e o mouse são dispositivos de entrada.' },
+  { s: 'O Linux foi criado por Bill Gates.', answer: false, exp: 'FALSO. O Linux foi criado por Linus Torvalds em 1991. Bill Gates fundou a Microsoft e criou o Windows.' },
+  { s: 'O Windows está presente em mais de 90% dos computadores pessoais do mundo.', answer: true,  exp: 'VERDADEIRO. O Windows é o sistema operacional mais usado no mundo, desenvolvido pela Microsoft desde 1981.' },
+  { s: 'O ransomware sequestra dados e exige pagamento para liberá-los.', answer: true,  exp: 'VERDADEIRO. Ransomware criptografa os arquivos da vítima e exige pagamento (resgate). "Como um ladrão que tranca sua casa por dentro."' },
+  { s: 'O firewall é um programa que remove vírus do computador.', answer: false, exp: 'FALSO. O firewall controla e filtra o tráfego de rede, bloqueando acessos indesejados. Quem remove vírus é o antivírus.' },
+  { s: 'Backup é uma cópia de segurança dos dados feita em outro dispositivo.', answer: true,  exp: 'VERDADEIRO. Backup protege contra perda de dados por falha de hardware, vírus ou acidentes — é uma segunda opção de recuperação.' },
+  { s: 'O SSD possui partes mecânicas em movimento, como discos giratórios.', answer: false, exp: 'FALSO. O SSD (Solid-State Drive) usa chips de memória flash, sem nenhuma peça mecânica. Por isso é mais rápido, silencioso e resistente.' },
+  { s: 'USB significa Universal Serial Bus.', answer: true,  exp: 'VERDADEIRO. USB = Universal Serial Bus. Simplificou a conexão de dispositivos ao computador, como pendrives, mouses e câmeras.' },
+  { s: 'A placa-mãe conecta e permite a comunicação entre todos os componentes do computador.', answer: true,  exp: 'VERDADEIRO. A placa-mãe é a "avenida principal" — conecta processador, RAM, armazenamento e GPU, distribuindo energia e dados.' },
+  { s: 'A memória RAM é permanente e guarda dados mesmo sem energia elétrica.', answer: false, exp: 'FALSO. A RAM é volátil: perde todos os dados ao desligar. Memórias permanentes (não voláteis) são HD e SSD.' },
+  { s: 'O Linux é gratuito e de código aberto (open source).', answer: true,  exp: 'VERDADEIRO. O Linux é free e open source — qualquer pessoa pode usar, modificar e distribuir. A versão mais popular para iniciantes é o Ubuntu.' },
+  { s: 'Malware é um software criado para prejudicar o computador ou roubar dados.', answer: true,  exp: 'VERDADEIRO. Malware (malicious software) é o termo genérico que inclui vírus, ransomware, spyware, adware e outros programas maliciosos.' },
+  { s: 'A GPU (placa de vídeo) é responsável apenas pelo armazenamento de dados.', answer: false, exp: 'FALSO. A GPU é responsável pelo processamento gráfico: jogos, edição de vídeo, renderização 3D e inteligência artificial.' },
+  { s: 'Phishing usa links e sites falsos para roubar senhas e dados pessoais.', answer: true,  exp: 'VERDADEIRO. Phishing ("pescaria") usa e-mails e páginas falsas para enganar usuários. "A isca parece real, mas é uma armadilha."' },
+  { s: 'Antes do Windows existia o MS-DOS, que funcionava apenas com comandos de texto.', answer: true,  exp: 'VERDADEIRO. O MS-DOS (1981) não tinha interface gráfica — o usuário digitava comandos de texto. O Windows trouxe janelas e ícones.' },
 ]
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5) }
 
-export default function VerdadeiroFalso({ onAddScore, onComplete, onNext, isCompleted }) {
+export default function VerdadeiroFalso({ onAddScore, onComplete, onNext }) {
   const [statements] = useState(() => shuffle(STATEMENTS))
   const [index, setIndex] = useState(0)
   const [answered, setAnswered] = useState(null)
@@ -56,13 +56,10 @@ export default function VerdadeiroFalso({ onAddScore, onComplete, onNext, isComp
     } else {
       setIndex(i => i + 1)
       setAnswered(null)
-      setTimeout(() => {}, 50)
     }
   }
 
-  const reset = () => {
-    setIndex(0); setAnswered(null); setScore(0); setHistory([]); setFinished(false); setFlipped(false)
-  }
+  const reset = () => { setIndex(0); setAnswered(null); setScore(0); setHistory([]); setFinished(false); setFlipped(false) }
 
   const correctCount = history.filter(h => h.correct).length
   const pct = finished ? Math.round((correctCount / statements.length) * 100) : 0
@@ -75,7 +72,7 @@ export default function VerdadeiroFalso({ onAddScore, onComplete, onNext, isComp
           <h2 className="text-2xl font-bold">Atividade concluída!</h2>
           <p className="text-4xl font-bold mt-2">{pct}%</p>
           <p className="opacity-90">{correctCount}/{statements.length} acertos</p>
-          <p className="text-sm opacity-80 mt-1">Pontos desta atividade: {score > 0 ? '+' : ''}{score}</p>
+          <p className="text-sm opacity-80 mt-1">Pontos: {score > 0 ? '+' : ''}{score}</p>
         </div>
         <div className="flex gap-3">
           <button onClick={reset} className="flex items-center gap-2 border-2 border-gray-200 hover:border-gray-300 text-gray-600 font-medium px-5 py-3 rounded-xl">
@@ -106,14 +103,11 @@ export default function VerdadeiroFalso({ onAddScore, onComplete, onNext, isComp
       {/* Card flip */}
       <div className={`card-flip ${flipped ? 'flipped' : ''}`} style={{ height: '220px' }}>
         <div className="card-flip-inner">
-          {/* Frente: afirmação */}
           <div className="card-front bg-white border-2 border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-center shadow-sm">
             <p className="text-petroleum-700 font-mono text-xs uppercase tracking-widest mb-4">Afirmação {index + 1}</p>
             <p className="text-gray-800 font-semibold text-lg leading-snug">{current.s}</p>
           </div>
-          {/* Verso: resposta */}
-          <div className={`card-back rounded-xl p-6 flex flex-col items-center justify-center text-center
-            ${answered === current.answer ? 'bg-green-50 border-2 border-green-300' : 'bg-red-50 border-2 border-red-300'}`}>
+          <div className={`card-back rounded-xl p-6 flex flex-col items-center justify-center text-center ${answered === current.answer ? 'bg-green-50 border-2 border-green-300' : 'bg-red-50 border-2 border-red-300'}`}>
             <div className="text-4xl mb-3">{answered === current.answer ? '✅' : '❌'}</div>
             <p className="font-bold text-lg mb-2">{current.answer ? 'VERDADEIRO' : 'FALSO'}</p>
             <p className="text-sm text-gray-700 leading-snug">{current.exp}</p>
@@ -121,33 +115,22 @@ export default function VerdadeiroFalso({ onAddScore, onComplete, onNext, isComp
         </div>
       </div>
 
-      {/* Botões V/F */}
       {answered === null && (
         <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={() => handleAnswer(true)}
-            className="flex items-center justify-center gap-3 py-5 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-lg shadow-md transition-all hover:scale-105 active:scale-95"
-          >
-            <CheckCircle size={28} />
-            Verdadeiro
+          <button onClick={() => handleAnswer(true)}
+            className="flex items-center justify-center gap-3 py-5 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-lg shadow-md transition-all hover:scale-105 active:scale-95">
+            <CheckCircle size={28} /> Verdadeiro
           </button>
-          <button
-            onClick={() => handleAnswer(false)}
-            className="flex items-center justify-center gap-3 py-5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-lg shadow-md transition-all hover:scale-105 active:scale-95"
-          >
-            <XCircle size={28} />
-            Falso
+          <button onClick={() => handleAnswer(false)}
+            className="flex items-center justify-center gap-3 py-5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-lg shadow-md transition-all hover:scale-105 active:scale-95">
+            <XCircle size={28} /> Falso
           </button>
         </div>
       )}
 
       {answered !== null && (
-        <button
-          onClick={advance}
-          className="w-full flex items-center justify-center gap-2 bg-petroleum-500 hover:bg-petroleum-600 text-white font-bold px-6 py-3 rounded-xl"
-        >
-          {index + 1 < statements.length ? 'Próxima afirmação' : 'Ver resultado'}
-          <ArrowRight size={16} />
+        <button onClick={advance} className="w-full flex items-center justify-center gap-2 bg-petroleum-500 hover:bg-petroleum-600 text-white font-bold px-6 py-3 rounded-xl">
+          {index + 1 < statements.length ? 'Próxima afirmação' : 'Ver resultado'} <ArrowRight size={16} />
         </button>
       )}
     </div>

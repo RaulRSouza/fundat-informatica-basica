@@ -14,7 +14,7 @@ const QUESTIONS = [
   { q: 'O HD usa discos...?', options: ['Magnéticos', 'Ópticos', 'Flash', 'Digitais'], answer: 0 },
 ]
 
-const TIMER = 10
+const TIMER = 45
 
 export default function QuizRelampago({ onAddScore, onComplete, onNext }) {
   const [questions] = useState(() => [...QUESTIONS].sort(() => Math.random() - 0.5))
@@ -112,13 +112,13 @@ export default function QuizRelampago({ onAddScore, onComplete, onNext }) {
   }
 
   const timerPct = (timeLeft / TIMER) * 100
-  const timerColor = timeLeft > 5 ? 'bg-green-500' : timeLeft > 3 ? 'bg-fundat-400' : 'bg-red-500'
-  const pulse = timeLeft <= 3
+  const timerColor = timeLeft > 20 ? 'bg-green-500' : timeLeft > 10 ? 'bg-fundat-400' : 'bg-red-500'
+  const pulse = timeLeft <= 10
 
   return (
     <div className="space-y-5 pb-8">
       {/* Header relâmpago */}
-      <div className={`rounded-2xl p-6 text-white transition-colors ${timeLeft <= 3 ? 'bg-red-600' : 'bg-petroleum-500'}`}>
+      <div className={`rounded-2xl p-6 text-white transition-colors ${timeLeft <= 10 ? 'bg-red-600' : 'bg-petroleum-500'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Zap size={20} className={pulse ? 'animate-ping text-fundat-300' : 'text-fundat-300'} />
