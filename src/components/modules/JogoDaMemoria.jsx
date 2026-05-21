@@ -1,145 +1,142 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ArrowRight, RotateCcw, Clock, Hash } from 'lucide-react'
 
-// Cada par: carta com FOTO do componente ↔ carta com DEFINIÇÃO
+// Imagens do Wikimedia Commons — domínio público, sem API key
 const PAIRS = [
   {
     id: 'cpu',
-    img: 'https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'Processador CPU',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Intel_80486DX2_bottom.jpg/240px-Intel_80486DX2_bottom.jpg',
     termLabel: 'CPU',
     def: 'Cérebro do computador',
     defEmoji: '🧠',
     color: '#3b82f6',
+    fallback: '🖥️',
   },
   {
     id: 'ram',
-    img: 'https://images.unsplash.com/photo-1562976540-1502c2145186?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'Memória RAM',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Swissbit_2GB_PC2-5300U-555.jpg/240px-Swissbit_2GB_PC2-5300U-555.jpg',
     termLabel: 'RAM',
     def: 'Memória temporária — perde dados ao desligar',
     defEmoji: '⚡',
     color: '#8b5cf6',
+    fallback: '💬',
   },
   {
     id: 'ssd',
-    img: 'https://images.unsplash.com/photo-1601737487795-dab272f52420?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'SSD drive',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Super_Talent_2.5in_SATA_SSD_SAM.jpg/240px-Super_Talent_2.5in_SATA_SSD_SAM.jpg',
     termLabel: 'SSD',
     def: 'Armazenamento rápido sem peças móveis',
     defEmoji: '💾',
     color: '#10b981',
+    fallback: '💿',
   },
   {
     id: 'hd',
-    img: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'HD Hard Disk',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Seagate_ST33232A_hard_disk_inner_view.jpg/240px-Seagate_ST33232A_hard_disk_inner_view.jpg',
     termLabel: 'HD',
     def: 'Disco rígido com partes mecânicas giratórias',
     defEmoji: '🔄',
     color: '#f97316',
+    fallback: '🔧',
   },
   {
     id: 'gpu',
-    img: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'Placa de vídeo GPU',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/MSI_GeForce_GTX_1050_Ti_4GT_OC.jpg/240px-MSI_GeForce_GTX_1050_Ti_4GT_OC.jpg',
     termLabel: 'GPU',
     def: 'Responsável pelo processamento gráfico',
     defEmoji: '🎮',
     color: '#ec4899',
+    fallback: '🖼️',
   },
   {
     id: 'firewall',
-    img: 'https://images.unsplash.com/photo-1614064641938-3bbdc4d7f598?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'Firewall segurança',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Lock-Combination.jpg/240px-Lock-Combination.jpg',
     termLabel: 'Firewall',
     def: 'Filtra e bloqueia acessos indesejados na rede',
     defEmoji: '🔥',
     color: '#ef4444',
+    fallback: '🛡️',
   },
   {
     id: 'phishing',
-    img: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'Phishing ataque hacker',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/240px-Tsunami_by_hokusai_19th_century.jpg',
     termLabel: 'Phishing',
     def: 'Golpe por link falso para roubar dados',
     defEmoji: '🎣',
     color: '#f59e0b',
+    fallback: '⚠️',
   },
   {
     id: 'backup',
-    img: 'https://images.unsplash.com/photo-1544396821-4dd40b938ad3?w=300&h=300&fit=crop&auto=format',
-    imgAlt: 'Backup armazenamento em nuvem',
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Usb-thumb-drive-3.0.jpg/240px-Usb-thumb-drive-3.0.jpg',
     termLabel: 'Backup',
     def: 'Cópia de segurança dos dados',
     defEmoji: '📦',
     color: '#06b6d4',
+    fallback: '☁️',
   },
 ]
-
-// Emoji fallback caso a imagem não carregue
-const FALLBACK_EMOJIS = {
-  cpu: '🖥️', ram: '💬', ssd: '💾', hd: '💿',
-  gpu: '🖼️', firewall: '🛡️', phishing: '⚠️', backup: '☁️',
-}
 
 function buildCards() {
   const cards = []
   PAIRS.forEach(p => {
-    // carta A = imagem
     cards.push({ uid: p.id + '-img', pairId: p.id, type: 'img' })
-    // carta B = definição
     cards.push({ uid: p.id + '-def', pairId: p.id, type: 'def' })
   })
   return cards.sort(() => Math.random() - 0.5)
 }
 
-// Carta com imagem
 function ImgCard({ pair, matched }) {
   const [error, setError] = useState(false)
-  const color = pair.color
   return (
     <div style={{
       width: '100%', height: '100%', borderRadius: 12, overflow: 'hidden',
-      background: matched ? color : '#f8fafc',
-      border: matched ? 'none' : `2px solid ${color}`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      background: matched ? pair.color : '#f1f5f9',
+      border: `3px solid ${pair.color}`,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
     }}>
       {!error ? (
         <img
           src={pair.img}
-          alt={pair.imgAlt}
+          alt={pair.termLabel}
           onError={() => setError(true)}
           style={{ width: '100%', height: '75%', objectFit: 'cover', display: 'block' }}
+          crossOrigin="anonymous"
         />
       ) : (
-        <span style={{ fontSize: '2.8rem', lineHeight: 1 }}>{FALLBACK_EMOJIS[pair.id]}</span>
+        <span style={{ fontSize: '3.5rem', lineHeight: 1, marginBottom: 6 }}>
+          {pair.fallback}
+        </span>
       )}
-      <span style={{
-        fontSize: '0.8rem', fontWeight: 800, color: matched ? '#fff' : color,
-        paddingTop: 6, paddingBottom: 6, letterSpacing: '0.06em',
+      <div style={{
+        background: pair.color,
+        width: '100%', textAlign: 'center',
+        padding: '5px 4px',
+        fontSize: '0.8rem', fontWeight: 800,
+        color: '#fff', letterSpacing: '0.05em',
+        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {pair.termLabel}
-      </span>
+      </div>
     </div>
   )
 }
 
-// Carta com definição
 function DefCard({ pair, matched }) {
-  const color = pair.color
   return (
     <div style={{
       width: '100%', height: '100%', borderRadius: 12,
-      background: matched ? color : '#fff',
-      border: matched ? 'none' : `2px solid ${color}`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '10px', textAlign: 'center',
+      background: matched ? pair.color : '#fff',
+      border: `3px solid ${pair.color}`,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      padding: '10px', textAlign: 'center', gap: 6,
     }}>
-      <span style={{ fontSize: '2.2rem', lineHeight: 1, marginBottom: 6 }}>{pair.defEmoji}</span>
+      <span style={{ fontSize: '2.5rem', lineHeight: 1 }}>{pair.defEmoji}</span>
       <span style={{
         fontSize: '0.75rem', fontWeight: 600, lineHeight: 1.35,
-        color: matched ? '#fff' : '#374151',
+        color: matched ? '#fff' : '#1f2937',
       }}>
         {pair.def}
       </span>
@@ -147,30 +144,33 @@ function DefCard({ pair, matched }) {
   )
 }
 
-// Carta individual com flip
 function Card({ card, pair, isFlipped, isMatched, onClick }) {
   const show = isFlipped || isMatched
   return (
     <div
       onClick={onClick}
-      style={{ perspective: '800px', cursor: show ? 'default' : 'pointer', height: 150 }}
+      style={{ perspective: '900px', cursor: show ? 'default' : 'pointer', height: 160 }}
     >
       <div style={{
         position: 'relative', width: '100%', height: '100%',
         transformStyle: 'preserve-3d',
-        transition: 'transform 0.45s ease',
+        transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)',
         transform: show ? 'rotateY(180deg)' : 'rotateY(0deg)',
       }}>
-        {/* Frente — logo "?" */}
+        {/* Frente — "?" */}
         <div style={{
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-          background: '#0d6e8a', borderRadius: 12,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '2rem', color: 'rgba(255,255,255,0.2)', fontWeight: 700,
-          userSelect: 'none',
+          background: 'linear-gradient(135deg, #0d6e8a 0%, #0a5870 100%)',
+          borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', gap: 6,
+          userSelect: 'none', cursor: 'pointer',
         }}>
-          ?
+          <span style={{ fontSize: '2.5rem', opacity: 0.3 }}>?</span>
+          <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.1em' }}>
+            CLIQUE
+          </span>
         </div>
 
         {/* Verso — conteúdo */}
@@ -179,6 +179,7 @@ function Card({ card, pair, isFlipped, isMatched, onClick }) {
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
           transform: 'rotateY(180deg)',
           borderRadius: 12, overflow: 'hidden',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}>
           {card.type === 'img'
             ? <ImgCard pair={pair} matched={isMatched} />
@@ -239,8 +240,9 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
   }, [cards, flipped, matched, locked, finished, onAddScore, onComplete])
 
   const reset = () => {
-    setCards(buildCards()); setFlipped([]); setMatched([]); setAttempts(0)
-    setSeconds(0); setRunning(true); setFinished(false); setLocked(false)
+    setCards(buildCards()); setFlipped([]); setMatched([])
+    setAttempts(0); setSeconds(0); setRunning(true)
+    setFinished(false); setLocked(false)
   }
 
   const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
@@ -251,9 +253,9 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
       <div className="bg-petroleum-500 text-white rounded-2xl p-6">
         <h2 className="text-xl font-bold">🃏 Jogo da Memória — Componentes do Computador</h2>
         <p className="text-petroleum-100 text-sm mt-1">
-          Encontre os 8 pares: <strong>foto do componente</strong> ↔ <strong>definição</strong>. Clique para virar.
+          Encontre os 8 pares: <strong>foto do componente</strong> ↔ <strong>definição</strong>
         </p>
-        <div className="flex items-center gap-6 mt-3 text-sm">
+        <div className="flex flex-wrap items-center gap-5 mt-3 text-sm">
           <div className="flex items-center gap-1.5">
             <Hash size={14} className="text-fundat-300" />
             <span>Tentativas: <strong>{attempts}</strong></span>
@@ -266,7 +268,7 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {cards.map(card => (
           <Card
             key={card.uid}
@@ -292,9 +294,9 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
 
       {finished && (
         <div className="bg-green-500 text-white rounded-2xl p-6 text-center">
-          <div className="text-4xl mb-2">🎉</div>
-          <h3 className="text-xl font-bold">Parabéns! Você completou o jogo!</h3>
-          <p className="mt-1 opacity-90">Tempo: {fmt(seconds)} · Tentativas: {attempts}</p>
+          <div className="text-5xl mb-3">🎉</div>
+          <h3 className="text-2xl font-bold">Parabéns! Você completou o jogo!</h3>
+          <p className="mt-2 opacity-90 text-lg">Tempo: {fmt(seconds)} · Tentativas: {attempts}</p>
           <p className="text-sm opacity-80 mt-1">+50 pontos bônus!</p>
         </div>
       )}
