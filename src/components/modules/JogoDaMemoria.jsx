@@ -110,14 +110,14 @@ function ImgCard({ pair, matched }) {
           src={pair.img}
           alt={pair.imgAlt}
           onError={() => setError(true)}
-          style={{ width: '100%', height: '70%', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: '75%', objectFit: 'cover', display: 'block' }}
         />
       ) : (
-        <span style={{ fontSize: '2rem', lineHeight: 1 }}>{FALLBACK_EMOJIS[pair.id]}</span>
+        <span style={{ fontSize: '2.8rem', lineHeight: 1 }}>{FALLBACK_EMOJIS[pair.id]}</span>
       )}
       <span style={{
-        fontSize: '0.65rem', fontWeight: 700, color: matched ? '#fff' : color,
-        paddingTop: 4, paddingBottom: 4, letterSpacing: '0.05em',
+        fontSize: '0.8rem', fontWeight: 800, color: matched ? '#fff' : color,
+        paddingTop: 6, paddingBottom: 6, letterSpacing: '0.06em',
       }}>
         {pair.termLabel}
       </span>
@@ -134,11 +134,11 @@ function DefCard({ pair, matched }) {
       background: matched ? color : '#fff',
       border: matched ? 'none' : `2px solid ${color}`,
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '6px', textAlign: 'center',
+      padding: '10px', textAlign: 'center',
     }}>
-      <span style={{ fontSize: '1.6rem', lineHeight: 1, marginBottom: 4 }}>{pair.defEmoji}</span>
+      <span style={{ fontSize: '2.2rem', lineHeight: 1, marginBottom: 6 }}>{pair.defEmoji}</span>
       <span style={{
-        fontSize: '0.6rem', fontWeight: 600, lineHeight: 1.3,
+        fontSize: '0.75rem', fontWeight: 600, lineHeight: 1.35,
         color: matched ? '#fff' : '#374151',
       }}>
         {pair.def}
@@ -153,7 +153,7 @@ function Card({ card, pair, isFlipped, isMatched, onClick }) {
   return (
     <div
       onClick={onClick}
-      style={{ perspective: '800px', cursor: show ? 'default' : 'pointer', height: 110 }}
+      style={{ perspective: '800px', cursor: show ? 'default' : 'pointer', height: 150 }}
     >
       <div style={{
         position: 'relative', width: '100%', height: '100%',
@@ -266,7 +266,7 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-2 md:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
         {cards.map(card => (
           <Card
             key={card.uid}
