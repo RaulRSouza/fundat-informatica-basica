@@ -1,121 +1,126 @@
 import { useState, useEffect, useCallback } from 'react'
-import { ArrowRight, RotateCcw, Clock, Hash } from 'lucide-react'
+import { ArrowRight, RotateCcw, Clock, Hash, Cpu, Database, HardDrive, Monitor, Shield, Fish, Cloud, Server } from 'lucide-react'
 
-// Imagens do Wikimedia Commons — domínio público, sem API key
+// Cada par: carta VISUAL (ícone estilizado) ↔ carta DEFINIÇÃO
 const PAIRS = [
   {
     id: 'cpu',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Intel_80486DX2_bottom.jpg/240px-Intel_80486DX2_bottom.jpg',
+    Icon: Cpu,
     termLabel: 'CPU',
-    def: 'Cérebro do computador',
+    bg: 'linear-gradient(135deg,#1d4ed8,#3b82f6)',
+    def: 'Cérebro do computador — executa todas as instruções',
     defEmoji: '🧠',
-    color: '#3b82f6',
-    fallback: '🖥️',
+    light: '#dbeafe',
+    dark: '#1d4ed8',
   },
   {
     id: 'ram',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Swissbit_2GB_PC2-5300U-555.jpg/240px-Swissbit_2GB_PC2-5300U-555.jpg',
+    Icon: Database,
     termLabel: 'RAM',
+    bg: 'linear-gradient(135deg,#6d28d9,#8b5cf6)',
     def: 'Memória temporária — perde dados ao desligar',
     defEmoji: '⚡',
-    color: '#8b5cf6',
-    fallback: '💬',
+    light: '#ede9fe',
+    dark: '#6d28d9',
   },
   {
     id: 'ssd',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Super_Talent_2.5in_SATA_SSD_SAM.jpg/240px-Super_Talent_2.5in_SATA_SSD_SAM.jpg',
+    Icon: HardDrive,
     termLabel: 'SSD',
-    def: 'Armazenamento rápido sem peças móveis',
+    bg: 'linear-gradient(135deg,#065f46,#10b981)',
+    def: 'Armazenamento sem partes móveis, rápido e silencioso',
     defEmoji: '💾',
-    color: '#10b981',
-    fallback: '💿',
+    light: '#d1fae5',
+    dark: '#065f46',
   },
   {
     id: 'hd',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Seagate_ST33232A_hard_disk_inner_view.jpg/240px-Seagate_ST33232A_hard_disk_inner_view.jpg',
+    Icon: Server,
     termLabel: 'HD',
-    def: 'Disco rígido com partes mecânicas giratórias',
+    bg: 'linear-gradient(135deg,#b45309,#f97316)',
+    def: 'Disco magnético com partes mecânicas giratórias',
     defEmoji: '🔄',
-    color: '#f97316',
-    fallback: '🔧',
+    light: '#ffedd5',
+    dark: '#b45309',
   },
   {
     id: 'gpu',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/MSI_GeForce_GTX_1050_Ti_4GT_OC.jpg/240px-MSI_GeForce_GTX_1050_Ti_4GT_OC.jpg',
+    Icon: Monitor,
     termLabel: 'GPU',
-    def: 'Responsável pelo processamento gráfico',
+    bg: 'linear-gradient(135deg,#9d174d,#ec4899)',
+    def: 'Processamento gráfico: jogos, vídeo e 3D',
     defEmoji: '🎮',
-    color: '#ec4899',
-    fallback: '🖼️',
+    light: '#fce7f3',
+    dark: '#9d174d',
   },
   {
     id: 'firewall',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Lock-Combination.jpg/240px-Lock-Combination.jpg',
+    Icon: Shield,
     termLabel: 'Firewall',
-    def: 'Filtra e bloqueia acessos indesejados na rede',
+    bg: 'linear-gradient(135deg,#991b1b,#ef4444)',
+    def: 'Filtra comunicações indesejadas e bloqueia invasões',
     defEmoji: '🔥',
-    color: '#ef4444',
-    fallback: '🛡️',
+    light: '#fee2e2',
+    dark: '#991b1b',
   },
   {
     id: 'phishing',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/240px-Tsunami_by_hokusai_19th_century.jpg',
+    Icon: Fish,
     termLabel: 'Phishing',
-    def: 'Golpe por link falso para roubar dados',
+    bg: 'linear-gradient(135deg,#b45309,#f59e0b)',
+    def: 'Golpe por link falso para roubar senhas e dados',
     defEmoji: '🎣',
-    color: '#f59e0b',
-    fallback: '⚠️',
+    light: '#fef3c7',
+    dark: '#b45309',
   },
   {
     id: 'backup',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Usb-thumb-drive-3.0.jpg/240px-Usb-thumb-drive-3.0.jpg',
+    Icon: Cloud,
     termLabel: 'Backup',
-    def: 'Cópia de segurança dos dados',
+    bg: 'linear-gradient(135deg,#0e7490,#06b6d4)',
+    def: 'Cópia de segurança dos dados em outro dispositivo',
     defEmoji: '📦',
-    color: '#06b6d4',
-    fallback: '☁️',
+    light: '#cffafe',
+    dark: '#0e7490',
   },
 ]
 
 function buildCards() {
   const cards = []
   PAIRS.forEach(p => {
-    cards.push({ uid: p.id + '-img', pairId: p.id, type: 'img' })
-    cards.push({ uid: p.id + '-def', pairId: p.id, type: 'def' })
+    cards.push({ uid: p.id + '-visual', pairId: p.id, type: 'visual' })
+    cards.push({ uid: p.id + '-def',    pairId: p.id, type: 'def'    })
   })
   return cards.sort(() => Math.random() - 0.5)
 }
 
-function ImgCard({ pair, matched }) {
-  const [error, setError] = useState(false)
+// Carta visual: gradiente + ícone grande + label
+function VisualCard({ pair, matched }) {
+  const Icon = pair.Icon
   return (
     <div style={{
       width: '100%', height: '100%', borderRadius: 12, overflow: 'hidden',
-      background: matched ? pair.color : '#f1f5f9',
-      border: `3px solid ${pair.color}`,
+      background: matched ? pair.bg : pair.light,
+      border: `3px solid ${pair.dark}`,
       display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
     }}>
-      {!error ? (
-        <img
-          src={pair.img}
-          alt={pair.termLabel}
-          onError={() => setError(true)}
-          style={{ width: '100%', height: '75%', objectFit: 'cover', display: 'block' }}
-          crossOrigin="anonymous"
-        />
-      ) : (
-        <span style={{ fontSize: '3.5rem', lineHeight: 1, marginBottom: 6 }}>
-          {pair.fallback}
-        </span>
-      )}
+      {/* Área do "ícone/foto" */}
       <div style={{
-        background: pair.color,
-        width: '100%', textAlign: 'center',
-        padding: '5px 4px',
-        fontSize: '0.8rem', fontWeight: 800,
-        color: '#fff', letterSpacing: '0.05em',
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flex: 1,
+        background: pair.bg,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Icon size={52} color="rgba(255,255,255,0.9)" strokeWidth={1.5} />
+      </div>
+      {/* Label inferior */}
+      <div style={{
+        background: pair.dark,
+        textAlign: 'center',
+        padding: '6px 4px',
+        fontSize: '0.82rem',
+        fontWeight: 800,
+        color: '#fff',
+        letterSpacing: '0.05em',
       }}>
         {pair.termLabel}
       </div>
@@ -123,19 +128,20 @@ function ImgCard({ pair, matched }) {
   )
 }
 
+// Carta definição: fundo claro + emoji + texto
 function DefCard({ pair, matched }) {
   return (
     <div style={{
       width: '100%', height: '100%', borderRadius: 12,
-      background: matched ? pair.color : '#fff',
-      border: `3px solid ${pair.color}`,
+      background: matched ? pair.bg : '#fff',
+      border: `3px solid ${pair.dark}`,
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      padding: '10px', textAlign: 'center', gap: 6,
+      padding: '10px', textAlign: 'center', gap: 8,
     }}>
-      <span style={{ fontSize: '2.5rem', lineHeight: 1 }}>{pair.defEmoji}</span>
+      <span style={{ fontSize: '2.4rem', lineHeight: 1 }}>{pair.defEmoji}</span>
       <span style={{
-        fontSize: '0.75rem', fontWeight: 600, lineHeight: 1.35,
+        fontSize: '0.72rem', fontWeight: 600, lineHeight: 1.4,
         color: matched ? '#fff' : '#1f2937',
       }}>
         {pair.def}
@@ -144,6 +150,7 @@ function DefCard({ pair, matched }) {
   )
 }
 
+// Carta com animação de flip
 function Card({ card, pair, isFlipped, isMatched, onClick }) {
   const show = isFlipped || isMatched
   return (
@@ -161,14 +168,14 @@ function Card({ card, pair, isFlipped, isMatched, onClick }) {
         <div style={{
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-          background: 'linear-gradient(135deg, #0d6e8a 0%, #0a5870 100%)',
-          borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+          background: 'linear-gradient(135deg,#0d6e8a 0%,#065f6b 100%)',
+          borderRadius: 12, boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
           display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', gap: 6,
+          alignItems: 'center', justifyContent: 'center', gap: 8,
           userSelect: 'none', cursor: 'pointer',
         }}>
-          <span style={{ fontSize: '2.5rem', opacity: 0.3 }}>?</span>
-          <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: '0.1em' }}>
+          <span style={{ fontSize: '2.8rem', opacity: 0.25 }}>?</span>
+          <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', fontWeight: 700, letterSpacing: '0.12em' }}>
             CLIQUE
           </span>
         </div>
@@ -179,11 +186,11 @@ function Card({ card, pair, isFlipped, isMatched, onClick }) {
           backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
           transform: 'rotateY(180deg)',
           borderRadius: 12, overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
         }}>
-          {card.type === 'img'
-            ? <ImgCard pair={pair} matched={isMatched} />
-            : <DefCard pair={pair} matched={isMatched} />
+          {card.type === 'visual'
+            ? <VisualCard pair={pair} matched={isMatched} />
+            : <DefCard   pair={pair} matched={isMatched} />
           }
         </div>
       </div>
@@ -192,14 +199,14 @@ function Card({ card, pair, isFlipped, isMatched, onClick }) {
 }
 
 export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
-  const [cards, setCards] = useState(() => buildCards())
+  const [cards, setCards]     = useState(() => buildCards())
   const [flipped, setFlipped] = useState([])
   const [matched, setMatched] = useState([])
   const [attempts, setAttempts] = useState(0)
-  const [seconds, setSeconds] = useState(0)
-  const [running, setRunning] = useState(true)
+  const [seconds, setSeconds]   = useState(0)
+  const [running, setRunning]   = useState(true)
   const [finished, setFinished] = useState(false)
-  const [locked, setLocked] = useState(false)
+  const [locked, setLocked]     = useState(false)
 
   useEffect(() => {
     if (!running || finished) return
@@ -245,7 +252,7 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
     setFinished(false); setLocked(false)
   }
 
-  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+  const fmt = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`
   const pairMap = Object.fromEntries(PAIRS.map(p => [p.id, p]))
 
   return (
@@ -253,7 +260,7 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
       <div className="bg-petroleum-500 text-white rounded-2xl p-6">
         <h2 className="text-xl font-bold">🃏 Jogo da Memória — Componentes do Computador</h2>
         <p className="text-petroleum-100 text-sm mt-1">
-          Encontre os 8 pares: <strong>foto do componente</strong> ↔ <strong>definição</strong>
+          Encontre os 8 pares: <strong>componente</strong> ↔ <strong>definição</strong>. Clique para virar.
         </p>
         <div className="flex flex-wrap items-center gap-5 mt-3 text-sm">
           <div className="flex items-center gap-1.5">
