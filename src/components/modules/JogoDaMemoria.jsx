@@ -120,10 +120,10 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
             <div
               key={card.uid}
               onClick={() => !show && handleFlip(card.uid)}
-              className={`card-flip cursor-pointer aspect-square rounded-xl shadow-sm transition-transform hover:scale-105 ${isMatched ? 'opacity-80' : ''}`}
+              className={`card-flip cursor-pointer aspect-square rounded-xl shadow-sm transition-transform hover:scale-105 ${isMatched ? 'opacity-80' : ''} ${show ? 'flipped' : ''}`}
               style={{ minHeight: '72px' }}
             >
-              <div className={`card-flip-inner ${show ? 'flipped' : ''}`}>
+              <div className="card-flip-inner">
                 {/* Verso (frente mostrada = costas da carta) */}
                 <div className="card-front bg-petroleum-500 rounded-xl flex items-center justify-center text-3xl text-white/30 font-bold select-none">
                   ?
