@@ -2,36 +2,122 @@ import { useState, useEffect, useCallback } from 'react'
 import { ArrowRight, RotateCcw, Clock, Hash } from 'lucide-react'
 
 const PAIRS = [
-  { id: 'cpu',       a: 'CPU',         b: 'Cérebro do computador 🧠' },
-  { id: 'ram',       a: 'RAM',         b: 'Memória temporária ⚡' },
-  { id: 'ssd',       a: 'SSD',         b: 'Armazenamento sem peças móveis 💾' },
-  { id: 'hd',        a: 'HD',          b: 'Disco rígido magnético 🖥️' },
-  { id: 'gpu',       a: 'GPU',         b: 'Processamento gráfico 🎮' },
-  { id: 'firewall',  a: 'Firewall',    b: 'Barreira contra invasões 🔥' },
-  { id: 'phishing',  a: 'Phishing',    b: 'Golpe por link falso 🎣' },
-  { id: 'backup',    a: 'Backup',      b: 'Cópia de segurança 📦' },
+  { id: 'cpu',      a: 'CPU',       b: 'Cérebro do computador 🧠' },
+  { id: 'ram',      a: 'RAM',       b: 'Memória temporária ⚡' },
+  { id: 'ssd',      a: 'SSD',       b: 'Sem peças móveis 💾' },
+  { id: 'hd',       a: 'HD',        b: 'Disco magnético 🖥️' },
+  { id: 'gpu',      a: 'GPU',       b: 'Processamento gráfico 🎮' },
+  { id: 'firewall', a: 'Firewall',  b: 'Barreira de rede 🔥' },
+  { id: 'phishing', a: 'Phishing',  b: 'Golpe por link falso 🎣' },
+  { id: 'backup',   a: 'Backup',    b: 'Cópia de segurança 📦' },
 ]
+
+const PAIR_COLORS = {
+  cpu:      '#3b82f6',
+  ram:      '#8b5cf6',
+  ssd:      '#10b981',
+  hd:       '#f97316',
+  gpu:      '#ec4899',
+  firewall: '#ef4444',
+  phishing: '#f59e0b',
+  backup:   '#06b6d4',
+}
 
 function buildCards() {
   const cards = []
   PAIRS.forEach(p => {
-    cards.push({ uid: p.id + '-a', pairId: p.id, text: p.a, side: 'a' })
-    cards.push({ uid: p.id + '-b', pairId: p.id, text: p.b, side: 'b' })
+    cards.push({ uid: p.id + '-a', pairId: p.id, text: p.a })
+    cards.push({ uid: p.id + '-b', pairId: p.id, text: p.b })
   })
   return cards.sort(() => Math.random() - 0.5)
 }
 
-export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isCompleted }) {
+// Carta individual com flip via inline styles
+function Card({ card, isFlipped, isMatched, onClick }) {
+  const show = isFlipped || isMatched
+  const color = PAIR_COLORS[card.pairId]
+
+  return (
+    <div
+      onClick={onClick}
+      style={{ perspective: '800px', cursor: show ? 'default' : 'pointer' }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '80px',
+          transformStyle: 'preserve-3d',
+          transition: 'transform 0.45s ease',
+          transform: show ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        }}
+      >
+        {/* Frente — lado escondido (?) */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            background: '#0d6e8a',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.75rem',
+            color: 'rgba(255,255,255,0.25)',
+            fontWeight: 700,
+            userSelect: 'none',
+          }}
+        >
+          ?
+        </div>
+
+        {/* Verso — conteúdo */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: isMatched ? color : '#fff',
+            border: isMatched ? 'none' : `2px solid ${color}`,
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '6px',
+            textAlign: 'center',
+            userSelect: 'none',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              lineHeight: 1.3,
+              color: isMatched ? '#fff' : color,
+            }}
+          >
+            {card.text}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function JogoDaMemoria({ onAddScore, onComplete, onNext }) {
   const [cards, setCards] = useState(() => buildCards())
-  const [flipped, setFlipped] = useState([])   // uids virados
-  const [matched, setMatched] = useState([])   // pairIds combinados
+  const [flipped, setFlipped] = useState([])
+  const [matched, setMatched] = useState([])
   const [attempts, setAttempts] = useState(0)
   const [seconds, setSeconds] = useState(0)
   const [running, setRunning] = useState(true)
   const [finished, setFinished] = useState(false)
   const [locked, setLocked] = useState(false)
 
-  // Cronômetro
   useEffect(() => {
     if (!running || finished) return
     const t = setInterval(() => setSeconds(s => s + 1), 1000)
@@ -40,7 +126,9 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
 
   const handleFlip = useCallback((uid) => {
     if (locked || finished) return
-    if (flipped.includes(uid) || matched.includes(cards.find(c => c.uid === uid)?.pairId)) return
+    const card = cards.find(c => c.uid === uid)
+    if (!card) return
+    if (flipped.includes(uid) || matched.includes(card.pairId)) return
     if (flipped.length === 2) return
 
     const newFlipped = [...flipped, uid]
@@ -49,10 +137,10 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
     if (newFlipped.length === 2) {
       setAttempts(a => a + 1)
       setLocked(true)
-      const [a, b] = newFlipped.map(id => cards.find(c => c.uid === id))
-      if (a.pairId === b.pairId) {
-        // Acerto
-        const newMatched = [...matched, a.pairId]
+      const [cardA, cardB] = newFlipped.map(id => cards.find(c => c.uid === id))
+
+      if (cardA.pairId === cardB.pairId) {
+        const newMatched = [...matched, cardA.pairId]
         setTimeout(() => {
           setMatched(newMatched)
           setFlipped([])
@@ -63,13 +151,12 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
             onAddScore(50)
             onComplete()
           }
-        }, 600)
+        }, 700)
       } else {
-        // Erro
         setTimeout(() => {
           setFlipped([])
           setLocked(false)
-        }, 1000)
+        }, 1100)
       }
     }
   }, [cards, flipped, matched, locked, finished, onAddScore, onComplete])
@@ -85,10 +172,7 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
     setLocked(false)
   }
 
-  const formatTime = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
-
-  const pairColors = ['bg-blue-500', 'bg-purple-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-red-500', 'bg-indigo-500']
-  const pairColorMap = Object.fromEntries(PAIRS.map((p, i) => [p.id, pairColors[i % pairColors.length]]))
+  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
   return (
     <div className="space-y-6 pb-8">
@@ -102,50 +186,36 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
           </div>
           <div className="flex items-center gap-1.5">
             <Clock size={14} className="text-fundat-300" />
-            <span>Tempo: <strong>{formatTime(seconds)}</strong></span>
+            <span>Tempo: <strong>{fmt(seconds)}</strong></span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span>✅ {matched.length}/{PAIRS.length} pares</span>
-          </div>
+          <span>✅ {matched.length}/{PAIRS.length} pares</span>
         </div>
       </div>
 
-      {/* Grade 4x4 */}
-      <div className="grid grid-cols-4 gap-2 md:gap-3">
-        {cards.map(card => {
-          const isFlipped = flipped.includes(card.uid)
-          const isMatched = matched.includes(card.pairId)
-          const show = isFlipped || isMatched
-          return (
-            <div
-              key={card.uid}
-              onClick={() => !show && handleFlip(card.uid)}
-              className={`card-flip cursor-pointer aspect-square rounded-xl shadow-sm transition-transform hover:scale-105 ${isMatched ? 'opacity-80' : ''} ${show ? 'flipped' : ''}`}
-              style={{ minHeight: '72px' }}
-            >
-              <div className="card-flip-inner">
-                {/* Verso (frente mostrada = costas da carta) */}
-                <div className="card-front bg-petroleum-500 rounded-xl flex items-center justify-center text-3xl text-white/30 font-bold select-none">
-                  ?
-                </div>
-                {/* Frente (conteúdo) */}
-                <div className={`card-back ${isMatched ? pairColorMap[card.pairId] : 'bg-white border-2 border-petroleum-300'} rounded-xl flex items-center justify-center p-2 text-center select-none`}>
-                  <span className={`text-xs font-bold leading-tight ${isMatched ? 'text-white' : 'text-petroleum-700'}`}>
-                    {card.text}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )
-        })}
+      <div className="grid grid-cols-4 gap-3">
+        {cards.map(card => (
+          <Card
+            key={card.uid}
+            card={card}
+            isFlipped={flipped.includes(card.uid)}
+            isMatched={matched.includes(card.pairId)}
+            onClick={() => handleFlip(card.uid)}
+          />
+        ))}
       </div>
 
       <div className="flex gap-3">
-        <button onClick={reset} className="flex items-center gap-2 border-2 border-gray-200 hover:border-gray-300 text-gray-600 font-medium px-5 py-3 rounded-xl">
+        <button
+          onClick={reset}
+          className="flex items-center gap-2 border-2 border-gray-200 hover:border-gray-300 text-gray-600 font-medium px-5 py-3 rounded-xl"
+        >
           <RotateCcw size={16} /> Jogar novamente
         </button>
         {finished && (
-          <button onClick={onNext} className="flex items-center gap-2 bg-fundat-400 hover:bg-fundat-500 text-white font-bold px-6 py-3 rounded-xl ml-auto">
+          <button
+            onClick={onNext}
+            className="flex items-center gap-2 bg-fundat-400 hover:bg-fundat-500 text-white font-bold px-6 py-3 rounded-xl ml-auto"
+          >
             Próximo <ArrowRight size={16} />
           </button>
         )}
@@ -155,8 +225,8 @@ export default function JogoDaMemoria({ onAddScore, onComplete, onNext, isComple
         <div className="bg-green-500 text-white rounded-2xl p-6 text-center">
           <div className="text-4xl mb-2">🎉</div>
           <h3 className="text-xl font-bold">Parabéns! Você completou o jogo!</h3>
-          <p className="mt-1 opacity-90">Tempo: {formatTime(seconds)} · Tentativas: {attempts}</p>
-          <p className="text-sm opacity-80 mt-1">+50 pontos bônus por completar!</p>
+          <p className="mt-1 opacity-90">Tempo: {fmt(seconds)} · Tentativas: {attempts}</p>
+          <p className="text-sm opacity-80 mt-1">+50 pontos bônus!</p>
         </div>
       )}
     </div>
